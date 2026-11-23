@@ -41,9 +41,11 @@ const TEMPLATES = {
 };
 
 // ---- REDEEM CODES (一次性兑换码) ----
-// Render free tier: ephemeral disk restarts on sleep wakeup.
-// Use persistent disk mount if available (/data), otherwise local dir.
-const DATA_DIR = process.env.RENDER_PERSISTENT_DISK_PATH || __dirname;
+// CloudBase/Docker containers: __dirname (/app) may be read-only.
+// Prefer writable dirs: /tmp (CloudBase), /data (Render), or __dirname (local dev).
+const DATA_DIR = process.env.RENDER_PERSISTENT_DISK_PATH
+  || process.env.CLOUDBASE_RUNTIME_DIR
+  || (fs.existsSync('/tmp') ? '/tmp' : __dirname);
 fs.mkdirSync(DATA_DIR, { recursive: true });
 const CODES_FILE = path.join(DATA_DIR, 'codes.json');
 
