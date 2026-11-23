@@ -35,9 +35,15 @@ const TEMPLATES = {
     duration: 4,
     cover: '',
     videoUrl: 'https://r2.apimodels.app/uploads/cmwrnulf2000308k1ggif0hgs/1795364825364_uychuoo.mp4'
+  },
+  'nov23': {
+    id: 'nov23',
+    name: '自定义桥段',
+    desc: '你的 11月23日 素材',
+    duration: 3,
+    cover: '',
+    videoUrl: 'https://r2.apimodels.app/uploads/cmwrnulf2000308k1ggif0hgs/1795437603304_owtqsl3.mp4'
   }
-  // 以后加更多模板，上传视频到 R2 后填 URL 进来：
-  // 'kuangqiang': { id:'kuangqiang', name:'狂飙名场面', duration:8, cover:'...', videoUrl:'...' }
 };
 
 // ---- REDEEM CODES (一次性兑换码) ----
