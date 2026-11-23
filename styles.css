@@ -799,3 +799,49 @@ svg { display: block; }
   color: var(--text-sub);
   margin: 0;
 }
+
+/* ---------- Contact Card ---------- */
+.section--contact { margin-top: 24px; }
+.contact-card {
+  background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(16,245,160,0.05));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.contact-card__title {
+  font-size: 16px; font-weight: 600;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+.contact-card__steps {
+  margin: 0 0 16px; padding-left: 20px;
+  font-size: 13px; line-height: 1.8;
+  color: var(--text-sub);
+}
+.contact-card__steps strong { color: var(--text); }
+.contact-card__ways {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 12px;
+}
+.contact-card__item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: rgba(15,15,26,0.5);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.contact-card__label {
+  font-size: 12px; font-weight: 600;
+  color: var(--primary);
+  min-width: 48px;
+}
+.contact-card__value {
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.contact-card__tip {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin: 0;
+}

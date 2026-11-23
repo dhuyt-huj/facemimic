@@ -53,7 +53,6 @@ function renderTemplates() {
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
-        <div class="template-card__play-hint">点击预览</div>
       </div>
       <div class="template-card__info">
         <h3>${t.name}</h3>
@@ -75,14 +74,31 @@ function renderTemplates() {
     el.addEventListener('touchstart', playPreview, { passive: true });
     el.addEventListener('touchend', pausePreview);
 
+    // 点击 = 直接选中/取消选中
     el.addEventListener('click', () => {
       pausePreview();
-      openPreview(state.templates.find(t => t.id === id));
+      if (state.templateId === id) {
+        // 再次点击同一张 → 取消选中
+        state.templateId = null;
+        toast('已取消选择');
+      } else {
+        // 选中这张
+        state.templateId = id;
+        state.customVideoUrl = null;
+        state.customDuration = null;
+        toast('已选中：' + tName(id));
+      }
+      renderTemplates();
+      updateGenerateBtn();
     });
   });
 
   // 更新「自定义视频替换」按钮
   updateCustomReplace();
+}
+
+function tName(id) {
+  return state.templates.find(t => t.id === id)?.name || '模板';
 }
 
 function updateCustomReplace() {
