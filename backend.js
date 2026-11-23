@@ -288,15 +288,16 @@ app.post('/api/swap', upload.single('face'), async (req, res) => {
 
     let videoUrl, duration, sourceLabel;
 
-    if (req.body.templateId && TEMPLATES[req.body.templateId]) {
+    // 自定义视频优先（如果传了 videoUrl，说明用户想用自己的视频替换模板）
+    if (req.body.videoUrl && req.body.duration) {
+      videoUrl = req.body.videoUrl;
+      duration = Math.min(6, Math.max(2, parseInt(req.body.duration)));
+      sourceLabel = 'custom-video';
+    } else if (req.body.templateId && TEMPLATES[req.body.templateId]) {
       const tmpl = TEMPLATES[req.body.templateId];
       videoUrl = tmpl.videoUrl;
       duration = tmpl.duration;
       sourceLabel = `template:${tmpl.name}`;
-    } else if (req.body.videoUrl && req.body.duration) {
-      videoUrl = req.body.videoUrl;
-      duration = Math.min(6, Math.max(2, parseInt(req.body.duration)));
-      sourceLabel = 'custom-video';
     } else {
       return res.status(400).json({ error: '请选择模板或上传自定义视频' });
     }

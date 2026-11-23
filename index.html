@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0A0A0F">
   <title>FaceSwap · AI 视频换人物 · ¥9.9 / 次</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body data-page="home">
   <!-- 背景氛围层 -->
@@ -41,6 +41,19 @@
 
       <div class="templates-grid" id="templatesGrid">
         <!-- JS 动态填充 -->
+      </div>
+
+      <!-- 自定义视频替换按钮（选中模板后可用） -->
+      <div class="custom-replace" id="customReplace" hidden>
+        <button class="custom-replace__btn" id="customReplaceBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span id="customReplaceLabel">用自定义视频替换</span>
+        </button>
+        <p class="custom-replace__hint" id="customReplaceHint" hidden>支持 MP4/MOV/WEBM · ≤6秒</p>
       </div>
     </section>
 
@@ -258,6 +271,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

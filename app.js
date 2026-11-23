@@ -40,16 +40,15 @@ async function loadTemplates() {
 
 function renderTemplates() {
   const grid = $('templatesGrid');
-  const isCustomSelected = state.templateId === 'custom';
 
-  // 内置模板卡片 + 自定义卡片
-  const cards = state.templates.map(t => `
+  // 只渲染内置模板（没有独立自定义卡片）
+  grid.innerHTML = state.templates.map(t => `
     <div class="template-card ${state.templateId === t.id ? 'is-selected' : ''}" data-id="${t.id}">
       <div class="template-card__cover">
         <video class="template-card__video" preload="metadata" muted loop playsinline
                src="${t.videoUrl}"></video>
         <div class="template-card__duration">${t.duration}秒</div>
-        <div class="template-card__check" hidden>
+        <div class="template-card__check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
@@ -63,69 +62,9 @@ function renderTemplates() {
     </div>
   `).join('');
 
-  // 自定义视频卡片
-  let customCard;
-  if (isCustomSelected && state.customVideoUrl) {
-    customCard = `
-      <div class="template-card is-selected template-card--custom" data-id="custom">
-        <div class="template-card__cover">
-          <video class="template-card__video" preload="metadata" muted loop playsinline
-                 src="${state.customVideoUrl}"></video>
-          <div class="template-card__duration">${state.customDuration}秒</div>
-          <div class="template-card__check">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
-          <div class="template-card__custom-tag">自定义</div>
-        </div>
-        <div class="template-card__info">
-          <h3>我的视频</h3>
-          <p>已上传，点击可重选</p>
-        </div>
-      </div>
-    `;
-  } else {
-    customCard = `
-      <div class="template-card template-card--add" data-id="__add__">
-        <div class="template-card__cover template-card__cover--empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-        </div>
-        <div class="template-card__info">
-          <h3>自定义视频</h3>
-          <p>上传自己的模板 · ≤6秒</p>
-        </div>
-      </div>
-    `;
-  }
-
-  grid.innerHTML = cards + customCard;
-
   // 给内置模板卡片绑定事件
   grid.querySelectorAll('.template-card').forEach(el => {
     const id = el.dataset.id;
-
-    // "自定义" 加号卡片 → 打开上传弹窗
-    if (id === '__add__') {
-      el.addEventListener('click', () => openCustomModal());
-      return;
-    }
-
-    // 已选的自定义卡片 → 重新打开上传弹窗可重选
-    if (id === 'custom') {
-      const video = el.querySelector('.template-card__video');
-      const playPreview = () => video.play().catch(()=>{});
-      const pausePreview = () => video.pause();
-      el.addEventListener('mouseenter', playPreview);
-      el.addEventListener('mouseleave', pausePreview);
-      el.addEventListener('click', () => openCustomModal());
-      return;
-    }
-
-    // 内置模板卡片：hover 播放 + 点击只弹窗预览
     const video = el.querySelector('.template-card__video');
 
     const playPreview = () => video.play().catch(() => {});
@@ -141,17 +80,62 @@ function renderTemplates() {
       openPreview(state.templates.find(t => t.id === id));
     });
   });
+
+  // 更新「自定义视频替换」按钮
+  updateCustomReplace();
 }
 
-function selectTemplate(id) {
-  state.templateId = id;
-  if (id !== 'custom') {
-    state.customVideoUrl = null;
-    state.customDuration = null;
+function updateCustomReplace() {
+  const wrap = $('customReplace');
+  const btn = $('customReplaceBtn');
+  const label = $('customReplaceLabel');
+  const hint = $('customReplaceHint');
+
+  if (!state.templateId) {
+    wrap.hidden = true;
+    return;
   }
-  renderTemplates();
-  updateGenerateBtn();
+
+  wrap.hidden = false;
+
+  if (state.customVideoUrl) {
+    // 已上传自定义视频 → 显示替换状态
+    btn.classList.add('is-active');
+    label.textContent = `✅ 已替换为自定义视频 (${state.customDuration}秒) · 点击重选`;
+    hint.hidden = false;
+    hint.textContent = '再次点击可换另一段，或点「×」恢复原模板';
+    // 添加清除按钮
+    if (!$('customReplaceClear')) {
+      const clear = document.createElement('button');
+      clear.id = 'customReplaceClear';
+      clear.type = 'button';
+      clear.className = 'custom-replace__clear';
+      clear.innerHTML = '&times;';
+      clear.title = '恢复原模板视频';
+      clear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.customVideoUrl = null;
+        state.customDuration = null;
+        updateCustomReplace();
+        updateGenerateBtn();
+        toast('已恢复模板原视频');
+      });
+      btn.appendChild(clear);
+    }
+  } else {
+    btn.classList.remove('is-active');
+    label.textContent = '🎬 用自定义视频替换此模板';
+    hint.hidden = false;
+    hint.textContent = '支持 MP4/MOV/WEBM · ≤6秒';
+    const clear = $('customReplaceClear');
+    if (clear) clear.remove();
+  }
 }
+
+$('customReplaceBtn').addEventListener('click', () => {
+  if (!state.templateId) return;
+  openCustomModal();
+});
 
 loadTemplates();
 
@@ -247,9 +231,7 @@ const PROGRESS_STEPS = [
 ];
 
 $('generateBtn').addEventListener('click', async () => {
-  if (!state.faceFile) return;
-  const hasSource = state.templateId && (state.templateId !== 'custom' || state.customVideoUrl);
-  if (!hasSource) return;
+  if (!state.faceFile || !state.templateId) return;
 
   // 未验证 → 先弹兑换码
   if (!state.codeVerified) {
@@ -265,10 +247,13 @@ $('generateBtn').addEventListener('click', async () => {
 
   try {
     const fd = new FormData();
-    if (state.templateId === 'custom') {
+    if (state.customVideoUrl) {
+      // 用户想用自定义视频替换模板
+      fd.append('templateId', state.templateId);
       fd.append('videoUrl', state.customVideoUrl);
       fd.append('duration', state.customDuration);
     } else {
+      // 用原模板
       fd.append('templateId', state.templateId);
     }
     fd.append('face', state.faceFile);
@@ -343,7 +328,6 @@ function showResult(url) {
 $('retryBtn').addEventListener('click', () => {
   $('section-result').hidden = true;
   state.taskId = null;
-  state.templateId = null;
   state.customVideoUrl = null;
   state.customDuration = null;
   renderTemplates();
@@ -451,15 +435,14 @@ $('customUploadBtn').addEventListener('click', async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || '上传失败');
 
-    // Set as selected custom template
-    state.templateId = 'custom';
+    // 上传成功 → 作为当前选中模板的自定义替换视频
     state.customVideoUrl = data.videoUrl;
     state.customDuration = data.duration;
 
     closeCustomModal();
-    renderTemplates();
+    updateCustomReplace();
     updateGenerateBtn();
-    toast('自定义视频上传成功！');
+    toast('自定义视频替换成功！');
   } catch (err) {
     console.error(err);
     toast(err.message || '上传失败');
