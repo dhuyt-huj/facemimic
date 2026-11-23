@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0A0A0F">
+  <title>FaceSwap · AI 视频换人物 · ¥9.9 / 次</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+</head>
+<body data-page="home">
+  <!-- 背景氛围层 -->
+  <div class="bg-atmosphere">
+    <div class="bg-glow bg-glow--purple"></div>
+    <div class="bg-glow bg-glow--green"></div>
+    <div class="bg-noise"></div>
+  </div>
+
+  <main class="app">
+    <!-- Hero -->
+    <header class="hero">
+      <div class="hero__badge">
+        <span class="hero__dot"></span>
+        AI · SEEDANCE 2.0 MINI
+      </div>
+      <h1 class="hero__title">
+        选个模板<br>
+        <span class="hero__title-accent">把你换进去</span>
+      </h1>
+      <p class="hero__desc">¥9.9 一次 · AI 让你成为经典桥段主角 · 动作表情 100% 跟住</p>
+    </header>
+
+    <!-- Step 1: 选模板 -->
+    <section class="section section--templates" id="section-templates">
+      <div class="section__header">
+        <div class="section__step">01</div>
+        <div>
+          <h2 class="section__title">选一个经典桥段</h2>
+          <p class="section__sub">点击卡片选中，支持更多模板即将上线</p>
+        </div>
+      </div>
+
+      <div class="templates-grid" id="templatesGrid">
+        <!-- JS 动态填充 -->
+      </div>
+    </section>
+
+    <!-- Step 2: 上传人脸照片 -->
+    <section class="section section--upload" id="section-face">
+      <div class="section__header">
+        <div class="section__step">02</div>
+        <div>
+          <h2 class="section__title">上传你的人脸照片</h2>
+          <p class="section__sub">清晰正脸、光线充足，效果翻倍</p>
+        </div>
+      </div>
+
+      <div class="upload-zone" id="faceUploadZone">
+        <input type="file" id="faceInput" accept="image/*" hidden>
+
+        <div class="upload-zone__empty" id="faceEmpty">
+          <div class="upload-zone__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="upload-zone__hint">点击或拖拽照片到此处</p>
+          <p class="upload-zone__hint-sub">JPG / PNG，建议 ≥ 500px</p>
+        </div>
+
+        <div class="upload-zone__preview" id="facePreview" hidden>
+          <img id="faceImg" alt="已上传照片">
+          <button class="upload-zone__remove" id="faceRemove" aria-label="移除">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: 生成 -->
+    <section class="section section--generate" id="section-generate">
+      <div class="section__header">
+        <div class="section__step">03</div>
+        <div>
+          <h2 class="section__title">一键生成</h2>
+          <p class="section__sub">模板 + 照片都选好后按钮自动激活 · ¥9.9 / 次</p>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="generateBtn" disabled>
+        <span class="btn-primary__glow"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        ¥9.9 开始生成
+      </button>
+
+      <div class="generating" id="generatingPanel" hidden>
+        <div class="generating__spinner"></div>
+        <p class="generating__text" id="generatingText">AI 正在分析视频帧…</p>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="generating__percent" id="generatingPercent">0%</p>
+        <p class="generating__hint">首次生成约需 2–5 分钟，请耐心等待</p>
+      </div>
+    </section>
+
+    <!-- Step 4: 结果 -->
+    <section class="section section--result" id="section-result" hidden>
+      <div class="section__header">
+        <div class="section__step section__step--done">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="section__title">换人物完成</h2>
+          <p class="section__sub">长按视频可保存 / 分享</p>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-card__video-wrap">
+          <video id="resultVideo" controls playsinline></video>
+          <div class="result-card__badge">
+            <span class="result-card__dot"></span>
+            FACESWAP · v2
+          </div>
+        </div>
+        <div class="result-card__actions">
+          <button class="btn-ghost" id="retryBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            换个模板试试
+          </button>
+          <a class="btn-primary btn-primary--sm" id="downloadBtn" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            保存视频
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Powered by Seedance 2.0 Mini · FaceSwap Demo</p>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" id="previewModal" hidden>
+    <div class="preview-modal__backdrop"></div>
+    <div class="preview-modal__content">
+      <button class="preview-modal__close" id="previewClose" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <h3 class="preview-modal__title" id="previewTitle"></h3>
+      <video id="previewVideo" controls playsinline></video>
+      <p class="preview-modal__desc" id="previewDesc"></p>
+      <div class="preview-modal__actions">
+        <button class="btn-primary btn-primary--sm" id="previewConfirm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          就用这个
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Video Upload Modal -->
+  <div class="preview-modal" id="customModal" hidden>
+    <div class="preview-modal__backdrop"></div>
+    <div class="preview-modal__content">
+      <button class="preview-modal__close" id="customClose" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <h3 class="preview-modal__title">上传自定义视频</h3>
+      <p class="preview-modal__desc" style="margin-bottom:14px;">支持 MP4/MOV/WEBM，≤6秒，≤100MB</p>
+
+      <div class="custom-upload" id="customUpload">
+        <input type="file" id="customInput" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
+
+        <div class="custom-upload__empty" id="customEmpty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>点击选择视频</p>
+          <p class="custom-upload__hint">或拖拽到此处</p>
+        </div>
+
+        <div class="custom-upload__preview" id="customPreview" hidden>
+          <video id="customVideo" muted loop playsinline></video>
+          <div class="custom-upload__meta">
+            <span id="customDuration">--秒</span>
+            <button class="custom-upload__remove" id="customRemove">重选</button>
+          </div>
+          <button class="btn-primary btn-primary--sm" id="customUploadBtn" style="width:100%;margin-top:12px;">
+            上传并使用
+          </button>
+        </div>
+
+        <div class="custom-upload__uploading" id="customUploading" hidden>
+          <div class="generating__spinner" style="width:32px;height:32px;"></div>
+          <p>正在上传到云端…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Redeem Code Modal (点击生成时弹出) -->
+  <div class="preview-modal" id="redeemModal" hidden>
+    <div class="preview-modal__backdrop"></div>
+    <div class="preview-modal__content" style="max-width:420px;">
+      <button class="preview-modal__close" id="redeemClose" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="redeem-modal__lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h3 class="preview-modal__title">输入兑换码</h3>
+      <p class="preview-modal__desc" style="margin-bottom:18px;">¥9.9 / 次 · 一码一用 · 付完款找我拿码</p>
+      <div class="redeem-modal__input-wrap">
+        <input type="text" id="redeemInput" placeholder="FK-XXXX-XXXX" maxlength="14" autocomplete="off" spellcheck="false" autocapitalize="characters">
+        <button class="btn-primary btn-primary--sm" id="redeemBtn">验证</button>
+      </div>
+      <p class="redeem-modal__hint" id="redeemHint" hidden></p>
+      <div class="redeem-modal__loader" id="redeemLoader" hidden>
+        <div class="generating__spinner" style="width:20px;height:20px;"></div>
+        <span>验证中…</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=4"></script>
+</body>
+</html>

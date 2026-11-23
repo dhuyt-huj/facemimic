@@ -1,0 +1,14 @@
+{
+  "name": "facemimic-backend",
+  "version": "1.0.0",
+  "description": "FaceMimic H5 backend - Seedance 2.5 video person swap via APIMODELS",
+  "main": "backend.js",
+  "scripts": {
+    "start": "node backend.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5"
+  }
+}

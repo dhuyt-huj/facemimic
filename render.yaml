@@ -1,0 +1,16 @@
+services:
+  - name: facemimic
+    type: web
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node backend.js
+    envVars:
+      - key: APIMODELS_KEY
+        sync: false
+    # Optional: persistent disk (free tier has ephemeral storage)
+    # Mount codes.json to /data so it survives restarts
+    disk:
+      name: facemimic-data
+      mountPath: /data
+      sizeGB: 1
