@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0A0A0F">
   <title>FaceSwap · AI 视频换人物 · ¥9.9 / 次</title>
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body data-page="home">
   <!-- 背景氛围层 -->
@@ -170,21 +170,28 @@
       <div class="contact-card">
         <h3 class="contact-card__title">💬 如何付款 · 如何拿码</h3>
         <ol class="contact-card__steps">
-          <li>支付宝 <strong>9.9 元</strong> → 收款账号（你填自己的）</li>
+          <li>扫码付款 <strong>¥9.9</strong>（支付宝 / 微信 任选）</li>
           <li>付款后截图发我 → 我给你发 <strong>兑换码</strong></li>
           <li>输入兑换码 → 开始生成 → 2-5 分钟出片</li>
         </ol>
-        <div class="contact-card__ways">
-          <div class="contact-card__item">
-            <span class="contact-card__label">支付宝</span>
-            <span class="contact-card__value">（填你的支付宝账号）</span>
+
+        <!-- 收款码 -->
+        <div class="contact-card__qrs">
+          <div class="contact-card__qr-item">
+            <div class="contact-card__qr-box">
+              <img id="alipayQr" src="./alipay-qr.jpg" alt="支付宝收款码">
+            </div>
+            <span class="contact-card__qr-label">支付宝扫我付款 ¥9.9</span>
           </div>
-          <div class="contact-card__item">
-            <span class="contact-card__label">微信</span>
-            <span class="contact-card__value">（填你的微信号）</span>
+          <div class="contact-card__qr-item">
+            <div class="contact-card__qr-box">
+              <img id="wechatQr" src="./wechat-qr.jpg" alt="微信收款码">
+            </div>
+            <span class="contact-card__qr-label">微信加好友联系我</span>
           </div>
         </div>
-        <p class="contact-card__tip">⏱️ 付完款我一般在 5 分钟内发码 · 一码一用 · 丢了联系我补发</p>
+
+        <p class="contact-card__tip">⏱️ 付完款我一般在 5 分钟内发码</p>
       </div>
     </section>
 
@@ -294,6 +301,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

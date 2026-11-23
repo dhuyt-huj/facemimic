@@ -7,7 +7,7 @@ const $ = (id) => document.getElementById(id);
 
 // ---- STATE ----
 const state = {
-  templateId: null,      // 内置模板 id，或 'custom' 表示自定义视频
+  templateId: 'girl-tongue', // 默认选中第一个模板
   customVideoUrl: null,  // 自定义视频上传后的 R2 URL
   customDuration: null,  // 自定义视频时长
   faceFile: null,

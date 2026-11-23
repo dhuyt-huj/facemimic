@@ -845,3 +845,31 @@ svg { display: block; }
   color: var(--text-sub);
   margin: 0;
 }
+.contact-card__qrs {
+  display: flex; justify-content: center; gap: 16px;
+  margin: 14px 0 16px;
+}
+.contact-card__qr-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.contact-card__qr-box {
+  width: 140px; height: 140px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.contact-card__qr-box img {
+  width: 100%; height: 100%; object-fit: contain;
+}
+.qr-placeholder {
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+  line-height: 1.4;
+}
+.contact-card__qr-label {
+  font-size: 11px;
+  color: var(--text-sub);
+}
