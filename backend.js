@@ -38,8 +38,8 @@ const TEMPLATES = {
   },
   'nov23': {
     id: 'nov23',
-    name: '自定义桥段',
-    desc: '你的 11月23日 素材',
+    name: '束发侍',
+    desc: '低姿态',
     duration: 3,
     cover: '',
     videoUrl: 'https://r2.apimodels.app/uploads/cmwrnulf2000308k1ggif0hgs/1795437603304_owtqsl3.mp4'
