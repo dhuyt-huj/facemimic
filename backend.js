@@ -54,6 +54,7 @@ const DATA_DIR = process.env.RENDER_PERSISTENT_DISK_PATH
   || (fs.existsSync('/tmp') ? '/tmp' : __dirname);
 fs.mkdirSync(DATA_DIR, { recursive: true });
 const CODES_FILE = path.join(DATA_DIR, 'codes.json');
+const HISTORY_FILE = path.join(DATA_DIR, 'history.json');
 
 function loadCodes() {
   try { return JSON.parse(fs.readFileSync(CODES_FILE, 'utf-8')); }
@@ -61,6 +62,20 @@ function loadCodes() {
 }
 function saveCodes(codes) {
   fs.writeFileSync(CODES_FILE, JSON.stringify(codes, null, 2));
+}
+
+// ---- HISTORY (生成历史) ----
+function loadHistory() {
+  try { return JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf-8')); }
+  catch { return []; }
+}
+function saveHistory(arr) {
+  fs.writeFileSync(HISTORY_FILE, JSON.stringify(arr, null, 2));
+}
+function addHistory(entry) {
+  const arr = loadHistory();
+  arr.unshift(entry); // 最新在前
+  saveHistory(arr.slice(0, 100)); // 最多保留 100 条
 }
 function genCode() {
   // FK-XXXX-XXXX（每段 4 位大写字母数字，易读）
@@ -327,6 +342,19 @@ app.post('/api/swap', upload.single('face'), async (req, res) => {
     const credits = taskRes.data.reservedCredits;
     console.log(`Task created: ${taskId} (reserved $${credits})`);
 
+    // 存一条 pending 历史
+    addHistory({
+      taskId,
+      templateId: req.body.templateId || null,
+      customVideo: !req.body.templateId,
+      duration,
+      state: 'pending',
+      videoUrl: null,
+      credits,
+      createdAt: new Date().toISOString(),
+      completedAt: null
+    });
+
     res.json({ taskId, credits });
   } catch (err) {
     console.error('ERROR:', err);
@@ -355,12 +383,45 @@ app.get('/api/swap/:taskId', async (req, res) => {
       }
     }
 
+    // 历史记录更新（仅在终态时写）
+    if (task.state === 'completed' || task.state === 'failed') {
+      const arr = loadHistory();
+      const idx = arr.findIndex(h => h.taskId === req.params.taskId);
+      if (idx >= 0) {
+        arr[idx].state = task.state;
+        arr[idx].videoUrl = task.state === 'completed' ? (task.resultUrls && task.resultUrls[0]) : null;
+        arr[idx].credits = task.credits || arr[idx].credits;
+        arr[idx].failMsg = task.state === 'failed' ? friendlyMsg : null;
+        arr[idx].completedAt = new Date().toISOString();
+        saveHistory(arr);
+      }
+    }
+
     res.json({
       state: task.state,
       videoUrl: task.state === 'completed' ? task.resultUrls[0] : null,
       credits: task.credits,
       failMsg: friendlyMsg
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. History list
+app.get('/api/history', (req, res) => {
+  try {
+    const arr = loadHistory();
+    // 补充模板名称
+    const withNames = arr.map(h => {
+      const tpl = h.templateId ? TEMPLATES[h.templateId] : null;
+      return {
+        ...h,
+        templateName: tpl ? tpl.name : (h.customVideo ? '自定义视频' : '未知'),
+        resultName: tpl ? tpl.name : '自定义视频'
+      };
+    });
+    res.json(withNames);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -543,3 +543,67 @@ async function verifyRedeemCode() {
     setTimeout(() => { hint.hidden = true; }, 2500);
   }
 }
+
+// ---------- History ----------
+function fmtTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const yest = new Date(now - 86400000);
+  if (sameDay) return `今天 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (d.toDateString() === yest.toDateString()) return `昨天 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function loadHistory() {
+  const list = $('historyList');
+  try {
+    const res = await fetch('/api/history');
+    const arr = await res.json();
+    if (!arr.length) {
+      list.innerHTML = '<p class="history-list__empty">还没有历史记录，去选个模板开始吧 ✨</p>';
+      return;
+    }
+    list.innerHTML = arr.map(h => {
+      const stClass = `history-item__state--${h.state}`;
+      const stLabel = { pending: '处理中', completed: '已完成', failed: '失败' }[h.state] || h.state;
+      const videoHtml = h.videoUrl
+        ? `<video class="history-item__video" src="${h.videoUrl}" muted playsinline></video>`
+        : `<div class="history-item__placeholder">⏳</div>`;
+      const actions = h.state === 'completed' && h.videoUrl
+        ? `<div class="history-item__actions">
+             <a href="${h.videoUrl}" download target="_blank">下载</a>
+             <a href="${h.videoUrl}" target="_blank">打开</a>
+           </div>`
+        : h.state === 'failed'
+          ? `<div class="history-item__actions"><button disabled>已失败</button></div>`
+          : `<div class="history-item__actions"><button disabled>处理中…</button></div>`;
+      return `
+        <div class="history-item">
+          ${videoHtml}
+          <div class="history-item__meta">
+            <div class="history-item__name">${h.templateName} · ${h.duration}秒</div>
+            <div class="history-item__time">${fmtTime(h.createdAt)}</div>
+            <span class="history-item__state ${stClass}">${stLabel}</span>
+            ${h.failMsg ? `<div class="history-item__failmsg">${h.failMsg}</div>` : ''}
+          </div>
+          ${actions}
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    list.innerHTML = `<p class="history-list__empty">加载失败：${err.message}</p>`;
+  }
+}
+
+// 页面加载 + 刷新按钮
+document.addEventListener('DOMContentLoaded', () => {
+  loadHistory();
+  $('btnHistoryRefresh')?.addEventListener('click', loadHistory);
+});
+
+// 生成完成后自动刷新历史
+const origShowResult = showResult;
+showResult = function(url) { origShowResult(url); loadHistory(); };
