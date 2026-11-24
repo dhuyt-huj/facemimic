@@ -427,6 +427,32 @@ app.get('/api/history', (req, res) => {
   }
 });
 
+// 4. Download proxy — 解决跨域 download 属性无效
+app.get('/api/download/:taskId', async (req, res) => {
+  try {
+    const arr = loadHistory();
+    const rec = arr.find(h => h.taskId === req.params.taskId);
+    if (!rec || !rec.videoUrl) return res.status(404).json({ error: '任务不存在或未完成' });
+
+    const url = rec.videoUrl;
+    const name = (rec.templateName || 'swap') + '-' + req.params.taskId.slice(-6) + '.mp4';
+
+    // 流式代理：R2 → 我们 → 用户，不占后端磁盘
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`R2 返回 ${r.status}`);
+
+    const total = r.headers.get('content-length');
+    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(name)}"`);
+    res.setHeader('Cache-Control', 'max-age=3600');
+    if (total) res.setHeader('Content-Length', total);
+
+    r.body.pipe(res);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ---- SERVE H5 STATIC FILES ----
 app.use(express.static(__dirname, {
   setHeaders: (res) => {

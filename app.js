@@ -335,7 +335,7 @@ function showResult(url) {
     $('generateBtn').disabled = true;
     $('section-result').hidden = false;
     $('resultVideo').src = url;
-    $('downloadBtn').href = url;
+    $('downloadBtn').href = '/api/download/' + state.taskId;
     setTimeout(() => $('resultVideo').play(), 200);
   }, 600);
 }
@@ -574,7 +574,7 @@ async function loadHistory() {
         : `<div class="history-item__placeholder">⏳</div>`;
       const actions = h.state === 'completed' && h.videoUrl
         ? `<div class="history-item__actions">
-             <a href="${h.videoUrl}" download target="_blank">下载</a>
+             <a href="/api/download/${h.taskId}" download>下载</a>
              <a href="${h.videoUrl}" target="_blank">打开</a>
            </div>`
         : h.state === 'failed'
