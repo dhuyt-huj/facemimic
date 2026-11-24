@@ -408,17 +408,19 @@ app.get('/api/swap/:taskId', async (req, res) => {
   }
 });
 
-// 3. History list
-app.get('/api/history', (req, res) => {
+// 3. History (admin-only, 需要 ?key=xxx)
+const ADMIN_KEY = process.env.ADMIN_KEY || 'facemimic-admin-2026';
+app.get('/api/admin/history', (req, res) => {
   try {
+    if (req.query.key !== ADMIN_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const arr = loadHistory();
-    // 补充模板名称
     const withNames = arr.map(h => {
       const tpl = h.templateId ? TEMPLATES[h.templateId] : null;
       return {
         ...h,
-        templateName: tpl ? tpl.name : (h.customVideo ? '自定义视频' : '未知'),
-        resultName: tpl ? tpl.name : '自定义视频'
+        templateName: tpl ? tpl.name : (h.customVideo ? '自定义视频' : '未知')
       };
     });
     res.json(withNames);
