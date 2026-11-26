@@ -144,14 +144,15 @@ app.get('/api/templates', (req, res) => {
 });
 
 // ---- MULTER: receive uploads ----
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, 'uploads'),
+  destination: UPLOAD_DIR,
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     cb(null, `${Date.now()}_${Math.random().toString(36).slice(2, 8)}${ext}`);
   }
 });
-fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
 
 const upload = multer({
   storage,
